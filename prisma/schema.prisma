@@ -30,7 +30,7 @@ model Subscription {
   user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
   name String
   amount Float
-  next_update         DateTime
+  next_update DateTime
   update_cycle_number Int
   update_cycle_unit   UpdateCycleUnit
   createdAt DateTime @default(now())
