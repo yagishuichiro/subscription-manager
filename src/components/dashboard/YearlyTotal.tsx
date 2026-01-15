@@ -1,27 +1,32 @@
-import { endOfMonth, getDaysInMonth, startOfMonth } from "date-fns";
+import { endOfYear, getDaysInYear, startOfYear } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Subscriptions } from "@/types/subscription";
 
-const MonthlyTotal = ({ subscriptions }: Subscriptions) => {
+const YearlyTotal = ({ subscriptions }: Subscriptions) => {
   const today = new Date();
-  const startMonth = startOfMonth(today);
-  const endMonth = endOfMonth(today);
-  const days = getDaysInMonth(today);
+  const startYear = startOfYear(today);
+  const endYear = endOfYear(today);
+  const days = getDaysInYear(today);
 
   const total = subscriptions.reduce((sum, subscription) => {
-    if (subscription.next_update >= startMonth && subscription.next_update <= endMonth) {
+    if (startYear <= subscription.next_update && endYear >= subscription.next_update) {
       if (subscription.update_cycle_unit === "DAY") {
         const cycleCount = days / subscription.update_cycle_number;
         return sum + subscription.amount * cycleCount;
+      } else if (subscription.update_cycle_unit === "MONTH") {
+        const cycleCount = 12 / subscription.update_cycle_number;
+        return sum + subscription.amount * cycleCount;
+      } else {
+        return sum + subscription.amount;
       }
-      return sum + subscription.amount;
     }
     return sum;
   }, 0);
+
   return (
     <Card className=" pt-[17px] pb-[45px]">
       <CardHeader>
-        <CardTitle className="font-medium">月間合計</CardTitle>
+        <CardTitle className="font-medium">年間合計</CardTitle>
       </CardHeader>
       <CardContent>
         <p className="text-right">
@@ -32,4 +37,4 @@ const MonthlyTotal = ({ subscriptions }: Subscriptions) => {
   );
 };
 
-export default MonthlyTotal;
+export default YearlyTotal;

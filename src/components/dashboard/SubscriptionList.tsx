@@ -7,6 +7,7 @@ import { Subscriptions } from "@/types/subscription";
 import { format } from "date-fns";
 
 const SubscriptionList = ({ subscriptions }: Subscriptions) => {
+    
   return (
     <Card className="mt-9.5 ">
       <CardHeader>
@@ -37,15 +38,15 @@ const SubscriptionList = ({ subscriptions }: Subscriptions) => {
                   ごと
                 </TableCell>
                 <TableCell>{format(subscription.next_update, "yyyy/MM/dd")}</TableCell>
-                <TableCell className="flex justify-end gap-x-[13px]">
+                <TableCell className="flex justify-end items-center gap-x-[13px]">
                   <figure className="w-[15px]">
                     <Link href="/addition">
                       <Image src="/icn-edit.svg" width={15} height={15} alt="編集のアイコン" />
                     </Link>
                   </figure>
-                  <figure className="w-[14px]">
+                  <button className="w-[14px]">
                     <Image src="/icn-delete.svg" width={14} height={16} alt="ゴミ箱のアイコン" />
-                  </figure>
+                  </button>
                 </TableCell>
               </TableRow>
             ))}
