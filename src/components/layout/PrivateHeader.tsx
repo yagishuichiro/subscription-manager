@@ -1,24 +1,16 @@
 "use client";
-import { signOut } from "@/lib/supabase/authEmail";
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import React, { FC } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import LogoutButton from "../ui/buttons/LogoutButton";
 
-const PrivateHeader: FC = () => {
-  const router = useRouter();
-  const onCLickLogout = async () => {
-    const result = await signOut();
-    if (result) router.push("/");
-  };
-
+const PrivateHeader = () => {
   return (
     <header className="flex justify-between items-center pt-4.5 pr-[25px] pb-3.5 pl-8.5 bg-gray-dr">
       <h1 className="w-[93px]">
@@ -41,9 +33,7 @@ const PrivateHeader: FC = () => {
             <DropdownMenuItem className="text-red-600 cursor-pointer">削除</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <figure onClick={onCLickLogout}>
-          <Image src="/icn-logout.svg" width={22} height={22} alt="logout" />
-        </figure>
+        <LogoutButton />
       </div>
     </header>
   );

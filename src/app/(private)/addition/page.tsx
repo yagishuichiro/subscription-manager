@@ -1,5 +1,4 @@
-import AddSubscriptionForm from "@/components/dashboard/AddSubscriptionForm";
-import React from "react";
+import AddSubscriptionForm from "@/components/forms/AddSubscriptionForm";
 
 const AdditionPage = () => {
   return (

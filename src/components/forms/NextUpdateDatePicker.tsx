@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { parseDate } from "chrono-node";
 import { CalendarIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -24,13 +23,14 @@ function formatDate(date: Date | undefined) {
 
 type Props = {
   errors?: string[];
+  defaultDate?: Date;
 };
 
-const NextUpdateDatePicker = ({ errors }: Props) => {
+const NextUpdateDatePicker = ({ errors, defaultDate }: Props) => {
   const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState("");
-  const [date, setDate] = React.useState<Date | undefined>(parseDate(value) || undefined);
-  const [month, setMonth] = React.useState<Date | undefined>(date);
+  const [date, setDate] = React.useState<Date | undefined>(defaultDate);
+  const [value, setValue] = React.useState(formatDate(defaultDate));
+  const [month, setMonth] = React.useState<Date | undefined>(defaultDate || date);
 
   function formatDateForForm(date: Date | undefined) {
     if (!date) return "";
@@ -52,17 +52,11 @@ const NextUpdateDatePicker = ({ errors }: Props) => {
           id="date"
           value={value}
           placeholder="日付を選択"
-          className="bg-background pr-10"
-          onChange={(e) => {
-            setValue(e.target.value);
-            const date = parseDate(e.target.value);
-            if (date) {
-              setDate(date);
-              setMonth(date);
-            }
-          }}
+          className="bg-background pr-10 cursor-pointer"
+          readOnly
+          onClick={() => setOpen(true)}
           onKeyDown={(e) => {
-            if (e.key === "ArrowDown") {
+            if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ") {
               e.preventDefault();
               setOpen(true);
             }

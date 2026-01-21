@@ -1,7 +1,6 @@
-import RegisterForm from "@/components/auth/RegisterForm";
-import React, { FC } from "react";
+import RegisterForm from "@/components/forms/RegisterForm";
 
-const SignUpPage: FC = () => {
+const SignUpPage = () => {
   return (
     <section className="py-[131px] px-10">
       <RegisterForm />

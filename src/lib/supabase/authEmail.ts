@@ -33,12 +33,23 @@ export async function login(prevState: ActionStateType, formData: FormData) {
     };
   }
 
+  const existingUser = await prisma.user.findUnique({
+    where: { email: data.email },
+  });
+
+  if (!existingUser) {
+    return {
+      success: false,
+      error: { message: "このメールアドレスは登録されていません" },
+    };
+  }
+
   const { error } = await supabase.auth.signInWithPassword(data);
 
   if (error) {
     return {
       success: false,
-      error: { message: "メールアドレスまたはパスワードが正しくありません" },
+      error: { message: "パスワードが正しくありません" },
     };
   }
 
@@ -63,7 +74,6 @@ export async function signup(prevState: ActionStateType, formData: FormData) {
     };
   }
 
-  // Prismaでメールアドレスが既に存在するか確認
   const existingUser = await prisma.user.findUnique({
     where: { email: data.email },
   });
@@ -96,7 +106,11 @@ export async function signup(prevState: ActionStateType, formData: FormData) {
 export async function signOut() {
   const supabase = await createClient();
   const { error } = await supabase.auth.signOut();
-  if (error) console.error("ログアウトエラー:", error.message);
-  if (!error) return true;
-  return false;
+
+  if (error) {
+    console.error("ログアウトエラー:", error.message);
+    return false;
+  }
+
+  return true;
 }

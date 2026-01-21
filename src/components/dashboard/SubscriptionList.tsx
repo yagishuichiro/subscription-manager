@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
@@ -5,9 +7,31 @@ import Link from "next/link";
 import Image from "next/image";
 import { Subscriptions } from "@/types/subscription";
 import { format } from "date-fns";
+import { deleteSubscription } from "@/lib/actions/subscription";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 const SubscriptionList = ({ subscriptions }: Subscriptions) => {
-    
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteSubscription(id);
+      window.location.reload();
+    } catch (error) {
+      toast.error("サブスクリプションの削除に失敗しました");
+      console.error(error);
+    }
+  };
+
   return (
     <Card className="mt-9.5 ">
       <CardHeader>
@@ -40,13 +64,36 @@ const SubscriptionList = ({ subscriptions }: Subscriptions) => {
                 <TableCell>{format(subscription.next_update, "yyyy/MM/dd")}</TableCell>
                 <TableCell className="flex justify-end items-center gap-x-[13px]">
                   <figure className="w-[15px]">
-                    <Link href="/addition">
+                    <Link href={`/edit/${subscription.id}`}>
                       <Image src="/icn-edit.svg" width={15} height={15} alt="編集のアイコン" />
                     </Link>
                   </figure>
-                  <button className="w-[14px]">
-                    <Image src="/icn-delete.svg" width={14} height={16} alt="ゴミ箱のアイコン" />
-                  </button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <button className="w-[14px]">
+                        <Image
+                          src="/icn-delete.svg"
+                          width={14}
+                          height={16}
+                          alt="ゴミ箱のアイコン"
+                        />
+                      </button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>本当に削除しますか？</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          サブスクリプションを削除します。
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>キャンセル</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => handleDelete(subscription.id)}>
+                          削除
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </TableCell>
               </TableRow>
             ))}

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useActionState, useEffect } from "react";
-import NextUpdateDatePicker from "@/components/dashboard/NextUpdateDatePicker";
+import NextUpdateDatePicker from "@/components/forms/NextUpdateDatePicker";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -17,8 +17,10 @@ import Link from "next/link";
 import { ActionStateType, addSubscription } from "@/lib/actions/subscription";
 import { Spinner } from "../ui/spinner";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const AddSubscriptionForm = () => {
+  const router = useRouter();
   const [state, formAction, isPending] = useActionState<ActionStateType, FormData>(
     addSubscription,
     {
@@ -29,10 +31,13 @@ const AddSubscriptionForm = () => {
   useEffect(() => {
     if (state.success) {
       toast.success("サブスクリプションを登録しました");
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 1000);
     } else if (state.error) {
       toast.error("登録に失敗しました");
     }
-  }, [state]);
+  }, [state, router]);
 
   return (
     <Card className="mt-8 pt-10 pb-12">
