@@ -1,22 +1,16 @@
 import React from "react";
-import { createClient } from "@/lib/supabase/server";
 import Image from "next/image";
-import { redirect } from "next/navigation";
 import SubscriptionList from "@/components/dashboard/SubscriptionList";
 import { getSubscriptions } from "@/lib/data/subscription";
 import MonthlyTotal from "@/components/dashboard/MonthlyTotal";
 import YearlyTotal from "@/components/dashboard/YearlyTotal";
 import SubscriptionCount from "@/components/dashboard/SubscriptionCount";
 import UpcomingSubscriptions from "@/components/dashboard/UpcomingSubscriptions";
+import { requireAuth } from "@/lib/supabase/auth";
 
 const DashboardPage = async () => {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase.auth.getUser();
-  if (error || !data?.user) {
-    redirect("/login");
-  }
-  const userId = data.user.id;
+  const user = await requireAuth();
+  const userId = user.id;
   const subscriptions = await getSubscriptions(userId);
 
   return (

@@ -2,7 +2,7 @@
 
 import React, { useActionState } from "react";
 import { Button } from "../ui/button";
-import { ActionStateType, signup } from "@/lib/supabase/authEmail";
+import { ActionStateType, signup } from "@/lib/supabase/auth";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import Image from "next/image";

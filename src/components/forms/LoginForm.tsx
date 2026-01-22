@@ -2,8 +2,7 @@
 
 import React, { useActionState } from "react";
 import { Button } from "../ui/button";
-import { signInWithGoogle } from "@/lib/supabase/authGoogle";
-import { ActionStateType, login } from "@/lib/supabase/authEmail";
+import { ActionStateType, login, signInWithGoogle } from "@/lib/supabase/auth";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import Image from "next/image";

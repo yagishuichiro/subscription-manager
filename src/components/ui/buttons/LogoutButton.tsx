@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { signOut } from "@/lib/supabase/authEmail";
+import { signOut } from "@/lib/supabase/auth";
 
 export default function LogoutButton() {
   const router = useRouter();

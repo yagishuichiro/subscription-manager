@@ -1,5 +1,3 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -9,8 +7,13 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import LogoutButton from "../ui/buttons/LogoutButton";
+import DeleteUserBtn from "../ui/buttons/DeleteUserBtn";
+import { requireAuth } from "@/lib/supabase/auth";
 
-const PrivateHeader = () => {
+const PrivateHeader = async () => {
+  const user = await requireAuth();
+  const userId = user.id;
+
   return (
     <header className="flex justify-between items-center pt-4.5 pr-[25px] pb-3.5 pl-8.5 bg-gray-dr">
       <h1 className="w-[93px]">
@@ -30,7 +33,7 @@ const PrivateHeader = () => {
             <DropdownMenuItem asChild>
               <Link href="">編集</Link>
             </DropdownMenuItem>
-            <DropdownMenuItem className="text-red-600 cursor-pointer">削除</DropdownMenuItem>
+            <DeleteUserBtn userId={userId} />
           </DropdownMenuContent>
         </DropdownMenu>
         <LogoutButton />

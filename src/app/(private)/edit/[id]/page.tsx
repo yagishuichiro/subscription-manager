@@ -1,21 +1,15 @@
 import EditSubscriptionForm from "@/components/forms/EditSubscriptionForm";
 import { getSubscription } from "@/lib/data/subscription";
-import { createClient } from "@/lib/supabase/server";
-import { redirect, notFound } from "next/navigation";
+import { requireAuth } from "@/lib/supabase/auth";
+import { notFound } from "next/navigation";
 
 type Params = {
   params: Promise<{ id: string }>;
 };
 
 export default async function EditPage({ params }: Params) {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase.auth.getUser();
-  if (error || !data?.user) {
-    redirect("/login");
-  }
-  const userId = data.user.id;
-
+  const user = await requireAuth();
+  const userId = user.id;
   const { id } = await params;
 
   const subscription = await getSubscription(userId, id);
