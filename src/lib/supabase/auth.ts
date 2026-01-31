@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { createClient, createAdminClient } from "./server";
 import { revalidatePath } from "next/cache";
-import { authSchema } from "../varidations/auth";
+import { authSchema, notificationEmailSchema } from "../varidations/auth";
 import { prisma } from "../prisma";
 
 export type ActionStateType = {
@@ -12,6 +12,7 @@ export type ActionStateType = {
   error?: {
     email?: string[];
     password?: string[];
+    notification_email?: string[];
     message?: string;
   };
 };
@@ -86,7 +87,16 @@ export async function signup(prevState: ActionStateType, formData: FormData) {
       },
     };
   }
-  const { error } = await supabase.auth.signUp(data);
+
+  const { data: authData, error } = await supabase.auth.signUp({
+    email: data.email,
+    password: data.password,
+    options: {
+      data: {
+        notification_email: data.email,
+      },
+    },
+  });
 
   if (error) {
     console.error("Supabase signup error:", error);
@@ -96,8 +106,76 @@ export async function signup(prevState: ActionStateType, formData: FormData) {
     };
   }
 
+  if (authData.user) {
+    const newUser = await prisma.user.create({
+      data: {
+        id: authData.user.id,
+        email: data.email,
+        notification_email: data.email,
+      },
+    });
+    console.log("新規ユーザー作成:", newUser);
+  }
+
   revalidatePath("/", "layout");
   redirect("/dashboard");
+}
+
+// ---------------------------------------------
+// 通知用メールアドレス変更
+// ---------------------------------------------
+export async function updateNotificationEmail(prevState: ActionStateType, formData: FormData) {
+  const supabase = await createClient();
+
+  const data = {
+    notification_email: formData.get("notification_email") as string,
+  };
+
+  const validate = notificationEmailSchema.safeParse(data);
+
+  if (!validate.success) {
+    return {
+      success: false,
+      error: validate.error.flatten().fieldErrors,
+    };
+  }
+
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+
+  if (error || !user) {
+    return {
+      success: false,
+      error: { message: "認証に失敗しました" },
+    };
+  }
+
+  try {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { notification_email: data.notification_email },
+    });
+
+    // Supabase Authのメタデータも更新
+    await supabase.auth.updateUser({
+      data: {
+        notification_email: data.notification_email,
+      },
+    });
+
+    return {
+      success: true,
+      message: "通知先メールアドレスを変更しました",
+    };
+  } catch (error) {
+    console.error("Notification email update failed:", error);
+    return {
+      success: false,
+      error: { message: "更新に失敗しました" },
+    };
+  }
 }
 
 // ---------------------------------------------

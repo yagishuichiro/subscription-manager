@@ -16,12 +16,13 @@ datasource db {
 }
 
 model User {
-  id    String @id  @db.Uuid
-  email String  @unique
-  name  String?
-  subscriptions Subscription[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                 String         @id @db.Uuid
+  email              String         @unique
+  notification_email String?
+  name               String?
+  subscriptions      Subscription[]
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
 }
 
 model Subscription {

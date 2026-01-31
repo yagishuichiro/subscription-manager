@@ -7,8 +7,8 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import LogoutButton from "../ui/buttons/LogoutButton";
-import DeleteUserBtn from "../ui/buttons/DeleteUserBtn";
 import { requireAuth } from "@/lib/supabase/auth";
+import DeleteUserMenuItem from "../ui/buttons/DeleteUserMenuItem";
 
 const PrivateHeader = async () => {
   const user = await requireAuth();
@@ -17,7 +17,9 @@ const PrivateHeader = async () => {
   return (
     <header className="flex justify-between items-center pt-4.5 pr-[25px] pb-3.5 pl-8.5 bg-gray-dr">
       <h1 className="w-[93px]">
-        <Image src="/lg-header.svg" width={93} height={23} alt="サブスクのロゴ" />
+        <Link href="/dashboard">
+          <Image src="/lg-header.svg" width={93} height={23} alt="サブスクのロゴ" />
+        </Link>
       </h1>
       <div className="flex items-center gap-[23px]">
         <DropdownMenu>
@@ -28,12 +30,12 @@ const PrivateHeader = async () => {
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem asChild>
-              <Link href="">詳細</Link>
+              <Link href="/account">詳細</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link href="">編集</Link>
             </DropdownMenuItem>
-            <DeleteUserBtn userId={userId} />
+            <DeleteUserMenuItem userId={userId} />
           </DropdownMenuContent>
         </DropdownMenu>
         <LogoutButton />

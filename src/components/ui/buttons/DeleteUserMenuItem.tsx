@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,18 +10,19 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { deleteUser } from "@/lib/supabase/auth";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 type Props = {
   userId: string;
 };
 
-export default function DeleteUserBtn({ userId }: Props) {
+export default function DeleteUserMenuItem({ userId }: Props) {
   const router = useRouter();
+  const [open, setOpen] = useState(false);
 
   const handleDelete = async () => {
     try {
@@ -34,10 +35,16 @@ export default function DeleteUserBtn({ userId }: Props) {
   };
 
   return (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <Button variant="destructive">削除</Button>
-      </AlertDialogTrigger>
+    <AlertDialog open={open} onOpenChange={setOpen}>
+      <DropdownMenuItem
+        className="text-red-600 cursor-pointer"
+        onSelect={(e) => {
+          e.preventDefault();
+          setOpen(true);
+        }}
+      >
+        削除
+      </DropdownMenuItem>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>本当に削除しますか？</AlertDialogTitle>

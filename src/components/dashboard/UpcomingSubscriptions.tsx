@@ -8,11 +8,13 @@ const UpcomingSubscriptions = ({ subscriptions }: Subscriptions) => {
   const today = startOfDay(new Date());
   const oneWeekLater = addWeeks(today, 1);
 
-  const upcomingSubscriptions = subscriptions.filter((subscription) => {
-    if (subscription.next_update >= today && subscription.next_update <= oneWeekLater) {
-      return subscription;
-    }
-  });
+  const upcomingSubscriptions = subscriptions
+    .filter((subscription) => {
+      if (subscription.next_update >= today && subscription.next_update <= oneWeekLater) {
+        return subscription;
+      }
+    })
+    .sort((a, b) => a.next_update.getTime() - b.next_update.getTime());
 
   return (
     <Card className="w-[calc((350/1456)*100%)]">
