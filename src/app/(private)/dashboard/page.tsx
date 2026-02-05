@@ -7,10 +7,12 @@ import YearlyTotal from "@/components/dashboard/YearlyTotal";
 import SubscriptionCount from "@/components/dashboard/SubscriptionCount";
 import UpcomingSubscriptions from "@/components/dashboard/UpcomingSubscriptions";
 import { requireAuth } from "@/lib/supabase/auth";
+import { updateSubscriptionDates } from "@/lib/actions/subscription";
 
 const DashboardPage = async () => {
   const user = await requireAuth();
   const userId = user.id;
+  await updateSubscriptionDates(userId);
   const subscriptions = await getSubscriptions(userId);
 
   return (

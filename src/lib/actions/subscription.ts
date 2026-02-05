@@ -4,6 +4,16 @@ import { UpdateCycleUnit } from "@/generated/prisma";
 import { subcriptionSchema } from "../varidations/subscription";
 import { createClient } from "../supabase/server";
 import { prisma } from "../prisma";
+import { requireAuth } from "../supabase/auth";
+import {
+  startOfDay,
+  addDays,
+  addMonths,
+  addYears,
+  differenceInDays,
+  differenceInMonths,
+  differenceInYears,
+} from "date-fns";
 
 export type ActionStateType = {
   success: boolean;
@@ -31,13 +41,7 @@ export async function addSubscription(prevState: ActionStateType, formData: Form
     return { success: false, error: validationResult.error.flatten().fieldErrors };
   }
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return { success: false, message: "不正なアクセスです" };
-  }
+  const user = await requireAuth();
   const userId = user.id;
 
   const { name, amount, update_cycle_number, update_cycle_unit, next_update } =
@@ -71,13 +75,7 @@ export async function editSubscription(prevState: ActionStateType, formData: For
     return { success: false, error: validationResult.error.flatten().fieldErrors };
   }
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return { success: false, message: "不正なアクセスです" };
-  }
+  const user = await requireAuth();
   const userId = user.id;
 
   const { name, amount, update_cycle_number, update_cycle_unit, next_update } =
@@ -97,6 +95,49 @@ export async function editSubscription(prevState: ActionStateType, formData: For
     },
   });
   return { success: true };
+}
+
+export async function updateSubscriptionDates(userId: string) {
+  const today = startOfDay(new Date());
+
+  const subscriptions = await prisma.subscription.findMany({
+    where: {
+      user_id: userId,
+      next_update: { lt: today },
+    },
+  });
+
+  for (const sub of subscriptions) {
+    let nextUpdate = startOfDay(sub.next_update);
+    let cyclesNeeded: number;
+
+    switch (sub.update_cycle_unit) {
+      case "DAY":
+        const daysDiff = differenceInDays(today, nextUpdate);
+        cyclesNeeded = Math.ceil(daysDiff / sub.update_cycle_number);
+        nextUpdate = addDays(nextUpdate, cyclesNeeded * sub.update_cycle_number);
+        break;
+      case "MONTH":
+        const monthsDiff = differenceInMonths(today, nextUpdate);
+        cyclesNeeded = Math.ceil(monthsDiff / sub.update_cycle_number);
+        nextUpdate = addMonths(nextUpdate, cyclesNeeded * sub.update_cycle_number);
+        break;
+      case "YEAR":
+        const yearsDiff = differenceInYears(today, nextUpdate);
+        cyclesNeeded = Math.ceil(yearsDiff / sub.update_cycle_number);
+        nextUpdate = addYears(nextUpdate, cyclesNeeded * sub.update_cycle_number);
+        break;
+      default:
+        const defaultMonthsDiff = differenceInMonths(today, nextUpdate);
+        cyclesNeeded = Math.ceil(defaultMonthsDiff);
+        nextUpdate = addMonths(nextUpdate, cyclesNeeded);
+    }
+
+    await prisma.subscription.update({
+      where: { id: sub.id },
+      data: { next_update: nextUpdate },
+    });
+  }
 }
 
 export async function deleteSubscription(id: string) {
